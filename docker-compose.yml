@@ -1,0 +1,49 @@
+services:
+  model-provider:
+    build:
+      context: .
+      dockerfile: model-provider/Dockerfile
+    container_name: model-provider
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./model_repository:/models
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  triton-server:
+    image: nvcr.io/nvidia/tritonserver:latest
+    container_name: triton-server
+    platform: linux/amd64
+    command: >
+      tritonserver
+      --model-repository=/models
+      --log-verbose=1
+    environment:
+      - CUDA_VISIBLE_DEVICES=
+      - NVIDIA_VISIBLE_DEVICES=none
+    ports:
+      - "8001:8001"
+      - "8002:8002"
+      - "8003:8003"
+    volumes:
+      - ./model_repository:/models
+
+  client-app:
+    build:
+      context: .
+      dockerfile: client-app/Dockerfile
+    container_name: client-app
+    depends_on:
+      model-provider:
+        condition: service_healthy
+      triton-server:
+        condition: service_started
+    environment:
+      - MODEL_PROVIDER_URL=http://model-provider:8000
+      - TRITON_URL=triton-server:8000
+    command: ["python", "client.py"]

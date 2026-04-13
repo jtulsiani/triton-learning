@@ -1,0 +1,8 @@
+torch
+torchvision
+onnx
+fastapi
+uvicorn
+tritonclient[http]
+numpy
+requests
