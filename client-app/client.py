@@ -6,12 +6,13 @@ import requests
 import tritonclient.http as httpclient
 
 MODEL_PROVIDER_URL = os.getenv("MODEL_PROVIDER_URL", "http://model-provider:8000")
-TRITON_URL = os.getenv("TRITON_URL", "triton-server:8001")
+TRITON_URL = os.getenv("TRITON_URL", "triton-server:8000")
 
 
 def wait_for_http(url: str, timeout_seconds: int = 180) -> None:
     start = time.perf_counter()
     while True:
+        print(f"Checking {url}")
         try:
             response = requests.get(url, timeout=3)
             if response.status_code == 200:
@@ -53,8 +54,10 @@ def run_triton_inference(tensor: np.ndarray) -> tuple[int, float]:
 
 
 def main() -> None:
+    print(f"Waiting for model-provider")
     wait_for_http(f"{MODEL_PROVIDER_URL}/health")
-    wait_for_http("http://triton-server:8001/v2/health/ready")
+    print(f"Waiting for triton-server")
+    wait_for_http(f"http://{TRITON_URL}/v2/health/ready")
 
     dummy_tensor = np.ones((1, 3, 224, 224), dtype=np.float32)
 
