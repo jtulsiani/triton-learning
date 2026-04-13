@@ -1,6 +1,6 @@
 name: "resnet50"
 platform: "onnxruntime_onnx"
-max_batch_size: 0
+max_batch_size: 8
 input [
   {
     name: "input"

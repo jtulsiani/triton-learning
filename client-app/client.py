@@ -6,7 +6,7 @@ import requests
 import tritonclient.http as httpclient
 
 MODEL_PROVIDER_URL = os.getenv("MODEL_PROVIDER_URL", "http://model-provider:8000")
-TRITON_URL = os.getenv("TRITON_URL", "triton-server:8000")
+TRITON_URL = os.getenv("TRITON_URL", "triton-server:8001")
 
 
 def wait_for_http(url: str, timeout_seconds: int = 180) -> None:
@@ -54,7 +54,7 @@ def run_triton_inference(tensor: np.ndarray) -> tuple[int, float]:
 
 def main() -> None:
     wait_for_http(f"{MODEL_PROVIDER_URL}/health")
-    wait_for_http("http://triton-server:8000/v2/health/ready")
+    wait_for_http("http://triton-server:8001/v2/health/ready")
 
     dummy_tensor = np.ones((1, 3, 224, 224), dtype=np.float32)
 
