@@ -1,4 +1,4 @@
-# Triton Learning Pipeline
+# Learning Triton
 
 Simple setup to learn about Triton Inference Server. Running using docker compose will:
 - start up model-provider, which will download Resnet50 weights and set it up with PyTorch. It will then export the ONNX file for the Triton server, and also serve the model directly with FastAPI from PyTorch.
